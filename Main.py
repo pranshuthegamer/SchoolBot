@@ -1,8 +1,10 @@
 import discord
+import json
 from discord.ext import commands
 prefix = "-"
 
- 
+token = open("token.txt","r")
+
 client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
 
@@ -37,4 +39,4 @@ async def unmute(context, member : discord.Member):
 
 
 
-bot.run('ODE3Njg1NjkxMDgwNzY5NTg3.YENHJA.T3oLFGv6KXgkwiA5BTWgHuXf8Go')
+bot.run(token.read)
