@@ -26,8 +26,8 @@ async def on_message(context):
     await bot.process_commands(context)
 
 @bot.event
-async def on_ready(self):
-    print('Logged on as {0}!'.format(self.user))
+async def on_ready():
+    print('We have logged in as {0.user}'.format(bot))
 
 
 @bot.command(name='mute')
