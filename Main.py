@@ -4,7 +4,7 @@ import os
 from discord.ext import commands
 prefix = "-"
 
-if os.path.exists("token.txt") == false:
+if os.path.exists("token.txt") == False:
     tok = open("token.txt","w")
     tok.write("put your token here")
     tok.close
