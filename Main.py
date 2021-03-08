@@ -8,6 +8,9 @@ if os.path.exists("token.txt") == False:
     tok = open("token.txt","w")
     tok.write("put your token here")
     tok.close
+    print("please put token in token.txt")
+    exit()
+
 
 token = open("token.txt","r")
 
