@@ -1,7 +1,13 @@
 import discord
 import json
+import os
 from discord.ext import commands
 prefix = "-"
+
+if os.path.exists("token.txt") == false:
+    tok = open("token.txt","w")
+    tok.write("put your token here")
+    tok.close
 
 token = open("token.txt","r")
 
