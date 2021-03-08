@@ -39,4 +39,4 @@ async def unmute(context, member : discord.Member):
 
 
 
-bot.run(token.read)
+bot.run(token.read())
