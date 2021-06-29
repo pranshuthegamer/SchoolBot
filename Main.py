@@ -38,6 +38,11 @@ async def on_voice_state_update(member, before, after):
         role = discord.utils.get(member.guild.roles, name="role name")
         await member.edit(mute=False)
 
+@bot.command(name="h")
+async def help(ctx):
+    helpfile = open("help.txt","r")
+    await ctx.channel.send(helpfile.read())
+
 @bot.command(name='mute')
 async def mute(ctx, member : discord.Member):
     sender:discord.Member = ctx.author

@@ -1,0 +1,18 @@
+-mute <user>
+	mutes the mentioned user
+
+-unmute <user>
+	Unmutes the mentioned user
+
+-vcmute
+	mutes everyone in the vc you are in
+
+-vcunmute
+	unmutes everyone in the vc you are in
+
+-vcmove <Users>
+	Moves specified users to specified vc
+
+-vcmoveall <current channel name or id> <Id or name of channel to be moved to>
+	moves everyone from first channel to second
+
