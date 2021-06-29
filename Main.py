@@ -86,8 +86,24 @@ async def vcunmuteall(ctx):
 
 @bot.command(name='vcmove')
 async def vcmove(ctx, members:commands.Greedy[discord.Member], *, channel:discord.VoiceChannel):
-  for member in members:
-    await member.move_to(channel=channel)
+    sender:discord.Member = ctx.author
+    checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
+    if checkrole1 in sender.roles:
+        for member in members:
+            await member.move_to(channel=channel)
+    else:
+        await ctx.channel.send("you dont have Mod role")
+
+@bot.command(name='vcmoveall')
+async def vcmoveall(ctx, channel1:discord.VoiceChannel, channel2:discord.VoiceChannel):
+    sender:discord.Member = ctx.author
+    checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
+    members = channel1.members
+    if checkrole1 in sender.roles:
+        for member in members:
+            await member.move_to(channel=channel2)
+    else:
+        await ctx.channel.send("you dont have Mod role")
 
 
 bot.run(token.read())
