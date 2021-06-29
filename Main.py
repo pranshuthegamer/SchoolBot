@@ -19,13 +19,13 @@ bot = commands.Bot(command_prefix=prefix)
 
 
 @bot.event
-async def on_message(context):
-    if context.content.startswith('ping'):
-        await context.channel.send('pong')
-    elif context.content.startswith('dick'):
-        await context.channel.send('dock')
-    print(context.author," : ",context.content)
-    await bot.process_commands(context)
+async def on_message(ctx):
+    if ctx.content.startswith('ping'):
+        await ctx.channel.send('pong')
+    elif ctx.content.startswith('dick'):
+        await ctx.channel.send('dock')
+    print(ctx.author," : ",ctx.content)
+    await bot.process_commands(ctx)
 
 
 @bot.event
@@ -39,26 +39,26 @@ async def on_voice_state_update(member, before, after):
         await member.edit(mute=False)
 
 @bot.command(name='mute')
-async def mute(context, member : discord.Member):
-    sender:discord.Member = context.author
-    checkrole1 = discord.utils.get(context.guild.roles, name = "Mod")
+async def mute(ctx, member : discord.Member):
+    sender:discord.Member = ctx.author
+    checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
     if checkrole1 in sender.roles:
-        role = discord.utils.get(context.guild.roles, name="Muted")
-        await context.channel.send(context.author.name + " Muted " + str(member.name))
+        role = discord.utils.get(ctx.guild.roles, name="Muted")
+        await ctx.channel.send(ctx.author.name + " Muted " + str(member.name))
         await member.add_roles(role)
     if checkrole1 not in sender.roles:
-        await context.channel.send("hey you dont have a Mod role")
+        await ctx.channel.send("hey you dont have a Mod role")
 
 @bot.command(name='unmute')
-async def unmute(context, member : discord.Member):
-    sender:discord.Member = context.author
-    checkrole1 = discord.utils.get(context.guild.roles, name = "Mod")
+async def unmute(ctx, member : discord.Member):
+    sender:discord.Member = ctx.author
+    checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
     if checkrole1 in sender.roles:
-        role = discord.utils.get(context.guild.roles, name="Muted")
-        await context.channel.send(context.author.name + " unmuted " + str(member.name))
+        role = discord.utils.get(ctx.guild.roles, name="Muted")
+        await ctx.channel.send(ctx.author.name + " unmuted " + str(member.name))
         await member.remove_roles(role)
     if checkrole1 not in sender.roles:
-        await context.channel.send("you dont have the Mod role")
+        await ctx.channel.send("you dont have the Mod role")
 
 @bot.command(name='vcmute')
 async def vcmuteall(ctx):
@@ -83,6 +83,11 @@ async def vcunmuteall(ctx):
             await member.edit(mute=False)
             print('unmuted ',member)
         print('unmuted everyone in ',vc)
+
+@bot.command(name='vcmove')
+async def vcmove(ctx, members:commands.Greedy[discord.Member], *, channel:discord.VoiceChannel):
+  for member in members:
+    await member.move_to(channel=channel)
 
 
 bot.run(token.read())
