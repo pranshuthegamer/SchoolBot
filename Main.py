@@ -6,15 +6,18 @@ prefix = "-"
 
 from webserver import keep_alive
 
-if os.path.exists("token.txt") == False:
-    tok = open("token.txt","w")
-    tok.write("put your token here")
-    tok.close
-    print("please put token in token.txt")
-    exit()
-
-
-token = open("token.txt","r")
+if "DISCORD_BOT_SECRET" in os.environ:
+    my_secret = os.environ['DISCOR']
+else:
+    if os.path.exists("token.txt") == False:
+        tok = open("token.txt","w")
+        tok.write("put your token here")
+        tok.close
+        print("please put token in token.txt or add Evironment Variable called 'DISCORD_BOT_SECRET' containing the token")
+        exit()
+    else:
+        my_secret = open("token.txt","r")
+        my_secret = my_secret.read()
 
 client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
@@ -114,11 +117,12 @@ async def vcmoveall(ctx, channel1:discord.VoiceChannel, channel2:discord.VoiceCh
 
 @bot.command(name='serverlist')
 async def servers(ctx):
-  servers = list(bot.guilds)
-  await ctx.send(f"Connected on {str(len(servers))} servers")
-  print(servers)
+    servers = list(bot.guilds)
+    await ctx.send(f"Connected on {str(len(servers))} servers")
+    print(servers)
+    for i in servers:
+        print(i.name)
 
-my_secret = os.environ['DISCORD_BOT_SECRET']
 
 keep_alive()
 bot.run(str(my_secret))
