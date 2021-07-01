@@ -116,7 +116,7 @@ async def vcmoveall(ctx, channel1:discord.VoiceChannel, channel2:discord.VoiceCh
     else:
         await ctx.channel.send("you dont have Mod role")
 
-@bot.command(name='serverlist')
+@bot.command(name='serverlist',help='shows how many people added me to their server')
 async def servers(ctx):
     servers = list(bot.guilds)
     await ctx.send(f"Connected on {str(len(servers))} servers")
@@ -124,6 +124,13 @@ async def servers(ctx):
     for i in servers:
         print(i.name)
 
+@bot.command(name='serverlistmore',help='only for devs')
+async def serversall(ctx):
+  servers = list(bot.guilds)
+  for server in servers:
+    print(server.name,": \n")
+    for channel in server.text_channels:
+      print(channel.name)
 
 keep_alive()
 bot.run(str(my_secret))
