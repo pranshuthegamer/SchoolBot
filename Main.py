@@ -4,6 +4,8 @@ import os
 from discord.ext import commands
 prefix = "-"
 
+from webserver import keep_alive
+
 if os.path.exists("token.txt") == False:
     tok = open("token.txt","w")
     tok.write("put your token here")
@@ -24,7 +26,7 @@ async def on_message(ctx):
         await ctx.channel.send('pong')
     elif ctx.content.startswith('dick'):
         await ctx.channel.send('dock')
-    print(ctx.author," : ",ctx.content)
+    print(ctx.guild.name,"    ",ctx.author," : ",ctx.content)
     await bot.process_commands(ctx)
 
 
@@ -110,5 +112,13 @@ async def vcmoveall(ctx, channel1:discord.VoiceChannel, channel2:discord.VoiceCh
     else:
         await ctx.channel.send("you dont have Mod role")
 
+@bot.command(name='serverlist')
+async def servers(ctx):
+  servers = list(bot.guilds)
+  await ctx.send(f"Connected on {str(len(servers))} servers")
+  print(servers)
 
-bot.run(token.read())
+my_secret = os.environ['DISCORD_BOT_SECRET']
+
+keep_alive()
+bot.run(str(my_secret))
