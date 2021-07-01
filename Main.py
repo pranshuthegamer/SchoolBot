@@ -1,3 +1,4 @@
+import os
 import discord
 import json
 import os
@@ -6,14 +7,14 @@ prefix = "-"
 
 from webserver import keep_alive
 
-if "DISCORD_BOT_SECRET" in os.environ:
-    my_secret = os.environ['DISCOR']
+if os.environ.get('BOT_TOKEN') is not None:
+  my_secret = os.environ['BOT_TOKEN']
 else:
     if os.path.exists("token.txt") == False:
         tok = open("token.txt","w")
         tok.write("put your token here")
         tok.close
-        print("please put token in token.txt or add Evironment Variable called 'DISCORD_BOT_SECRET' containing the token")
+        print("please put token in token.txt or add Evironment Variable called 'BOT_TOKEN' containing the token")
         exit()
     else:
         my_secret = open("token.txt","r")
