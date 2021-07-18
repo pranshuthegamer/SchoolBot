@@ -46,10 +46,12 @@ def check_prefix(ctx):
     print("read file")
     serverconfig = json.load(serverfile)
     cprefix = str(serverconfig["prefix"])
-    print("using custom prefix")
+    if cprefix.endswith(' '):
+      pass
+    else:
+      cprefix = cprefix + " "
     return(cprefix)
   except:
-    print("using default prefix")
     return(prefix)
 
 
