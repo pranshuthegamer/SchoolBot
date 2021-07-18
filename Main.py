@@ -29,9 +29,12 @@ bot = commands.Bot(command_prefix=prefix)
 async def check_mod(ctx):
   try:
     serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","r")
+    serverconfig = json.open(serverfile)
+    modrole = serverconfig["mod"]
+
     return(True)
   except:
-    ctx.send("setup mod permissions. eg:\n -setup mod <role name or id>")
+    await ctx.send("setup mod role. eg:\n -setup mod <role name or id>\n this tells the bot which role to check for when using the bot")
     return(False)
     
 
@@ -152,6 +155,7 @@ async def setup(ctx,prop=None,value=None):
       serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","r")
     except:
       serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","w")
+    
     try:
       serverconfig = json.load(serverfile)
     except:
