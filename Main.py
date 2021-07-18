@@ -3,7 +3,7 @@ import discord
 import json
 import os
 from discord.ext import commands
-prefix = "school"
+prefix = "-"
 
 setuprunning = True
 setupprogress = 0
@@ -39,13 +39,17 @@ async def check_mod(ctx):
     return(False)
     
 #Check prefix of individual server
-async def check_prefix(ctx):
+def check_prefix(ctx):
   try:
-    serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","r")
-    serverconfig = json.open(serverfile)
-    cprefix = serverconfig["prefix"]
+    print("trying to use custom prefix")
+    serverfile = open("servers/" + str(ctx.author.guild.id)+ ".json","r")
+    print("read file")
+    serverconfig = json.load(serverfile)
+    cprefix = str(serverconfig["prefix"])
+    print("using custom prefix")
     return(cprefix)
   except:
+    print("using default prefix")
     return(prefix)
 
 
@@ -56,7 +60,7 @@ async def on_message(ctx):
   elif ctx.content.startswith('dick'):
     await ctx.channel.send('dock')
   print(ctx.guild.name,"    ",ctx.author," : ",ctx.content)
-  await cprefix = check_prefix(ctx)
+  cprefix = check_prefix(ctx)
   bot.command_prefix = str(cprefix)
   await bot.process_commands(ctx)
 
