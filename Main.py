@@ -5,6 +5,9 @@ import os
 from discord.ext import commands
 prefix = "-"
 
+setuprunning = True
+setupprogress = 0
+
 from webserver import keep_alive
 
 if os.environ.get('BOT_TOKEN') is not None:
@@ -23,26 +26,36 @@ else:
 client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
 
+async def check_mod(ctx):
+  try:
+    serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","r")
+    return(True)
+  except:
+    ctx.send("setup mod permissions. eg:\n -setup mod <role name or id>")
+    return(False)
+    
+
+
 
 @bot.event
 async def on_message(ctx):
-    if ctx.content.startswith('ping'):
-        await ctx.channel.send('pong')
-    elif ctx.content.startswith('dick'):
-        await ctx.channel.send('dock')
-    print(ctx.guild.name,"    ",ctx.author," : ",ctx.content)
-    await bot.process_commands(ctx)
+  if ctx.content.startswith('ping'):
+    await ctx.channel.send('pong')
+  elif ctx.content.startswith('dick'):
+    await ctx.channel.send('dock')
+  print(ctx.guild.name,"    ",ctx.author," : ",ctx.content)
+  await bot.process_commands(ctx)
 
 
 @bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(bot))
+  print('We have logged in as {0.user}'.format(bot))
 
 @bot.event
 async def on_voice_state_update(member, before, after):
-    if not before.channel and after.channel:
-        role = discord.utils.get(member.guild.roles, name="role name")
-        await member.edit(mute=False)
+  if not before.channel and after.channel:
+    role = discord.utils.get(member.guild.roles, name="role name")
+    await member.edit(mute=False)
 
 @bot.command(name="h")
 async def help(ctx):
@@ -57,7 +70,7 @@ async def mute(ctx, member : discord.Member):
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await ctx.channel.send(ctx.author.name + " Muted " + str(member.name))
         await member.add_roles(role)
-    if checkrole1 not in sender.roles:
+    if checkrole1 == False:
         await ctx.channel.send("hey you dont have a Mod role")
 
 @bot.command(name='unmute')
@@ -131,6 +144,36 @@ async def serversall(ctx):
     print(server.name,": \n")
     for channel in server.text_channels:
       print(channel.name)
+
+@bot.command(command="setup",help='not working')
+async def setup(ctx,prop=None,value=None):
+  if value:
+    try:
+      serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","r")
+    except:
+      serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","w")
+    try:
+      serverconfig = json.load(serverfile)
+    except:
+      serverconfig = {}
+    print(serverconfig)
+    if prop == "mod":
+      checkrole1 = discord.utils.get(ctx.guild.roles, name = value)
+      if checkrole1 == None:
+        checkrole1 = ctx.guild.get_role(int(value))
+      if checkrole1 != None:
+        serverconfig["mod"] = checkrole1.id
+        await ctx.send("mod is now "+str(checkrole1.name))
+      else:
+        print(checkrole1)
+        await ctx.send("That Role Doesnt Exist")
+    else:
+      serverconfig[str(prop)] = str(value)
+      await ctx.send(str(prop)+" is now "+str(value))
+    serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","w")
+    serverconfig = json.dump(serverconfig,serverfile,indent=4)
+  else:
+    await ctx.send("How to use:\nFirst of all after -setup you have to give it two arguements, one for the property and other for the properties value. for eg:\n-setup mod Mod")
 
 keep_alive()
 bot.run(str(my_secret))
