@@ -3,7 +3,7 @@ import discord
 import json
 import os
 from discord.ext import commands
-prefix = "-"
+prefix = "school"
 
 setuprunning = True
 setupprogress = 0
@@ -26,18 +26,27 @@ else:
 client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
 
+
+#Check if user is mod
 async def check_mod(ctx):
   try:
     serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","r")
     serverconfig = json.open(serverfile)
     modrole = serverconfig["mod"]
-
     return(True)
   except:
     await ctx.send("setup mod role. eg:\n -setup mod <role name or id>\n this tells the bot which role to check for when using the bot")
     return(False)
     
-
+#Check prefix of individual server
+async def check_prefix(ctx):
+  try:
+    serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","r")
+    serverconfig = json.open(serverfile)
+    cprefix = serverconfig["prefix"]
+    return(cprefix)
+  except:
+    return(prefix)
 
 
 @bot.event
@@ -47,6 +56,8 @@ async def on_message(ctx):
   elif ctx.content.startswith('dick'):
     await ctx.channel.send('dock')
   print(ctx.guild.name,"    ",ctx.author," : ",ctx.content)
+  await cprefix = check_prefix(ctx)
+  bot.command_prefix = str(cprefix)
   await bot.process_commands(ctx)
 
 
