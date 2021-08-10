@@ -59,8 +59,6 @@ def check_prefix(ctx):
 async def on_message(ctx):
   if ctx.content.startswith('ping'):
     await ctx.channel.send('pong')
-  elif ctx.content.startswith('dick'):
-    await ctx.channel.send('dock')
   print(ctx.guild.name,"    ",ctx.author," : ",ctx.content)
   cprefix = check_prefix(ctx)
   bot.command_prefix = str(cprefix)
