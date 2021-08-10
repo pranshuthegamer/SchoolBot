@@ -159,7 +159,8 @@ async def serversall(ctx):
   for server in servers:
     print(server.name,": \n")
     for channel in server.text_channels:
-      print(channel.name)
+      print("    ",channel.name)
+    print("\n\n")
 
 @bot.command(command="setup",help='not working')
 async def setup(ctx,prop=None,value=None):
