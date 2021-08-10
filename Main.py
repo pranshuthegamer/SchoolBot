@@ -41,9 +41,7 @@ async def check_mod(ctx):
 #Check prefix of individual server
 def check_prefix(ctx):
   try:
-    print("trying to use custom prefix")
     serverfile = open("servers/" + str(ctx.author.guild.id)+ ".json","r")
-    print("read file")
     serverconfig = json.load(serverfile)
     cprefix = str(serverconfig["prefix"])
     if cprefix.endswith(' '):
