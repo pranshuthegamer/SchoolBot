@@ -155,7 +155,7 @@ async def vcunmuteall(ctx):
             print('unmuted ',member)
         print('unmuted everyone in ',vc)
 
-@bot.command(name='vcmove')
+@bot.command(name='vcmove',description='to specify the channels, you can use "" ')
 async def vcmove(ctx, members:commands.Greedy[discord.Member], *, channel:discord.VoiceChannel):
     sender:discord.Member = ctx.author
     checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
@@ -165,7 +165,7 @@ async def vcmove(ctx, members:commands.Greedy[discord.Member], *, channel:discor
     else:
         await ctx.channel.send("you dont have Mod role")
 
-@bot.command(name='vcmoveall')
+@bot.command(name='vcmoveall',description='to specify the channels, you can use "" ')
 async def vcmoveall(ctx, channel1:discord.VoiceChannel, channel2:discord.VoiceChannel):
     sender:discord.Member = ctx.author
     checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
