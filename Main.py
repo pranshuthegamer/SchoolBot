@@ -4,7 +4,15 @@ import json
 import os
 import string
 from discord.ext import commands
+from discord import DMChannel
 import threading
+import asyncio
+
+asyncio.get_event_loop().set_debug(True)
+
+intents = discord.Intents.default()
+intents.presences = True ##->> all this is required
+
 prefix = "-"
 
 setuprunning = True
@@ -74,17 +82,17 @@ async def on_message(ctx):
   bot.command_prefix = str(cprefix)
   await bot.process_commands(ctx)
 
-@client.event
+@bot.event
 async def on_guild_join(guild):
-    general = find(lambda x: x.name == 'general',  guild.text_channels)
-    for i in guild.text_channels:
-      if i.permissions_for(guild.me).send_messages:
-        embed=discord.Embed(title="**======== *Thanks For Adding Me!* ========**", description=f"""
-        Thanks for adding me to {guild.name}!
-        You can use the `-help` command to get started! also try using -setup to setup the bot
-        """, color=0xd89522)
-        await general.send(embed=embed)
-        break
+  print("Joined new server: ",guild.name)
+  for i in guild.text_channels:
+    if i.permissions_for(guild.me).send_messages:
+      embed=discord.Embed(title="**======== *Thanks For Adding Me!* ========**", description=f"""
+      Thanks for adding me to {guild.name}!
+      You can use the `-help` command to get started! also try using -setup to setup the bot
+      """, color=0xd89522)
+      await i.send(embed=embed)
+      break
 
 @bot.event
 async def on_ready():
