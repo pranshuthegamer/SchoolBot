@@ -8,7 +8,7 @@ from discord import DMChannel
 import threading
 import asyncio
 
-asyncio.get_event_loop().set_debug(True)
+#asyncio.get_event_loop().set_debug(True)
 
 intents = discord.Intents.default()
 intents.presences = True ##->> all this is required
