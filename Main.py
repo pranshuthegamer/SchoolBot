@@ -196,34 +196,36 @@ async def serversall(ctx):
 
 @bot.command(command="setup",help='not working')
 async def setup(ctx,prop=None,value=None):
-  if value:
-    try:
-      serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","r")
-    except:
-      serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","w")
+  if ctx.message.author.guild_permissions.administrator:
+    if value:
+      try:
+        serverfile = open("servers/" + str(ctx.message.guild.id)+  ".json","r")
+      except:
+        serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","w")
     
-    try:
-      serverconfig = json.load(serverfile)
-    except:
-      serverconfig = {}
-    print(serverconfig)
-    if prop == "mod":
-      checkrole1 = discord.utils.get(ctx.guild.roles, name = value)
-      if checkrole1 == None:
-        checkrole1 = ctx.guild.get_role(int(value))
-      if checkrole1 != None:
-        serverconfig["mod"] = checkrole1.id
-        await ctx.send("mod is now "+str(checkrole1.name))
+      try:
+        serverconfig = json.load(serverfile)
+      except:
+        serverconfig = {}
+      print(serverconfig)
+      if prop == "mod":
+        checkrole1 = discord.utils.get(ctx.guild.roles, name = value)
+        if checkrole1 == None:
+          checkrole1 = ctx.guild.get_role(int(value))
+        if checkrole1 != None:
+          serverconfig["mod"] = checkrole1.id
+          await ctx.send("mod is now "+str(checkrole1.name))
+        else:
+          print(checkrole1)
+          await ctx.send("That Role Doesnt Exist")
       else:
-        print(checkrole1)
-        await ctx.send("That Role Doesnt Exist")
+        serverconfig[str(prop)] = str(value)
+        await ctx.send(str(prop)+" is now "+str(value))
+      serverfile = open("servers/" + str(ctx.message.guild.id) + ".json","w")
+      serverconfig = json.dump(serverconfig,serverfile,indent=4)
     else:
-      serverconfig[str(prop)] = str(value)
-      await ctx.send(str(prop)+" is now "+str(value))
-    serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","w")
-    serverconfig = json.dump(serverconfig,serverfile,indent=4)
+      await ctx.send("How to use:\nFirst of all after -setup you have to give it two arguements, one for the property and other for the properties value. for eg:\n-setup mod Mod")
   else:
-    await ctx.send("How to use:\nFirst of all after -setup you have to give it two arguements, one for the property and other for the properties value. for eg:\n-setup mod Mod")
-
+    ctx.send("get an admin to do this")
 keep_alive()
 bot.run(str(my_secret))
