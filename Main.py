@@ -65,6 +65,17 @@ async def on_message(ctx):
   bot.command_prefix = str(cprefix)
   await bot.process_commands(ctx)
 
+@client.event
+async def on_guild_join(guild):
+    general = find(lambda x: x.name == 'general',  guild.text_channels)
+    for i in guild.text_channels:
+      if i.permissions_for(guild.me).send_messages:
+        embed=discord.Embed(title="**======== *Thanks For Adding Me!* ========**", description=f"""
+        Thanks for adding me to {guild.name}!
+        You can use the `-help` command to get started! also try using -setup to setup the bot
+        """, color=0xd89522)
+        await general.send(embed=embed)
+        break
 
 @bot.event
 async def on_ready():
