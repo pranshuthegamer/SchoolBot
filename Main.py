@@ -3,6 +3,7 @@ import discord
 import json
 import os
 from discord.ext import commands
+import thread
 prefix = "-"
 
 setuprunning = True
