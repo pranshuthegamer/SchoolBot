@@ -147,11 +147,12 @@ async def vcmoveall(ctx, channel1:discord.VoiceChannel, channel2:discord.VoiceCh
 
 @bot.command(name='serverlist',help='shows how many people added me to their server')
 async def servers(ctx):
+    print("\n")
     servers = list(bot.guilds)
     await ctx.send(f"Connected on {str(len(servers))} servers")
-    print(servers)
     for i in servers:
         print(i.name)
+    print("\n")
 
 @bot.command(name='serverlistmore',help='only for devs')
 async def serversall(ctx):
