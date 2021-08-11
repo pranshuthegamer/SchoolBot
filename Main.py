@@ -165,7 +165,7 @@ async def servers(ctx):
     servers = list(bot.guilds)
     await ctx.send(f"Connected on {str(len(servers))} servers")
     for i in servers:
-        print(i.name)
+        print(i.name,"  ".i.id)
     print("\n")
 
 @bot.command(name='serverlistmore',help='only for devs')
