@@ -224,7 +224,7 @@ async def setup(ctx,prop=None,value=None):
       serverfile = open("servers/" + str(ctx.message.guild.id) + ".json","w")
       serverconfig = json.dump(serverconfig,serverfile,indent=4)
     else:
-      await ctx.send("How to use:\nFirst of all after -setup you have to give it two arguements, one for the property and other for the properties value. for eg:\n-setup mod Mod")
+      await ctx.send("How to use:\nFirst of all after -setup you have to give it two arguements, one for the property and other for the properties value. for eg:\n-setup mod <name or id of mod role>")
   else:
     ctx.send("get an admin to do this")
 keep_alive()
