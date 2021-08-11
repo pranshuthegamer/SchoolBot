@@ -2,12 +2,20 @@ import os
 import discord
 import json
 import os
+import string
 from discord.ext import commands
 import threading
 prefix = "-"
 
 setuprunning = True
 setupprogress = 0
+
+ASCII_LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
+ASCII_UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+DECIMAL_DIGITS = "0123456789"
+ALPHABETS = ASCII_LOWERCASE + ASCII_UPPERCASE
+
+
 
 from webserver import keep_alive
 
@@ -45,11 +53,12 @@ def check_prefix(ctx):
     serverfile = open("servers/" + str(ctx.author.guild.id)+ ".json","r")
     serverconfig = json.load(serverfile)
     cprefix = str(serverconfig["prefix"])
-    if cprefix.endswith(' '):
-      pass
+    c = list(str(cprefix))
+    c = c[len(c) - 1]
+    if c not in ALPHABETS:
+      return(cprefix)
     else:
-      cprefix = cprefix + " "
-    return(cprefix)
+      return(str(cprefix + " "))
   except:
     return(prefix)
 
