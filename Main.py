@@ -158,12 +158,15 @@ async def on_voice_state_update(member, before, after):
 async def mute(ctx, member : discord.Member):
     sender:discord.Member = ctx.author
     checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
-    if checkrole1 in sender.roles:
-        role = discord.utils.get(ctx.guild.roles, name="Muted")
-        await ctx.channel.send(ctx.author.name + " Muted " + str(member.name))
-        await member.add_roles(role)
-    if checkrole1 == False:
-        await ctx.channel.send("hey you dont have a Mod role")
+    try:
+      if checkrole1 in sender.roles:
+          role = discord.utils.get(ctx.guild.roles, name="Muted")
+          await ctx.channel.send(ctx.author.name + " Muted " + str(member.name))
+          await member.add_roles(role)
+      if checkrole1 == False:
+          await ctx.channel.send("hey you dont have a Mod role")
+    except:
+      await ctx.channel.send('you dont a role called "Muted"')
 
 
 
@@ -173,12 +176,16 @@ async def mute(ctx, member : discord.Member):
 async def unmute(ctx, member : discord.Member):
     sender:discord.Member = ctx.author
     checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
-    if checkrole1 in sender.roles:
-        role = discord.utils.get(ctx.guild.roles, name="Muted")
-        await ctx.channel.send(ctx.author.name + " unmuted " + str(member.name))
-        await member.remove_roles(role)
-    if checkrole1 not in sender.roles:
-        await ctx.channel.send("you dont have the Mod role")
+    try:
+      if checkrole1 in sender.roles:
+          role = discord.utils.get(ctx.guild.roles, name="Muted")
+          await ctx.channel.send(ctx.author.name + " unmuted " + str(member.name))
+          await member.remove_roles(role)
+      if checkrole1 not in sender.roles:
+          await ctx.channel.send("you dont have the Mod role")
+    except:
+      await ctx.channel.send('you dont a role called "Muted"')
+
 
 
 
