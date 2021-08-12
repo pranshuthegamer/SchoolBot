@@ -10,6 +10,10 @@ import asyncio
 
 #asyncio.get_event_loop().set_debug(True)
 
+
+
+
+
 intents = discord.Intents.default()
 intents.presences = True ##->> all this is required
 
@@ -26,6 +30,25 @@ ALPHABETS = ASCII_LOWERCASE + ASCII_UPPERCASE
 
 
 from webserver import keep_alive
+
+
+#
+# error handling
+#
+async def error_handler(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send('You didnt give the arguments properly, try using help')
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send('You do not have manage_messages permssion')
+
+
+
+
+#
+#commands here
+#
+
+
 
 if os.environ.get('BOT_TOKEN') is not None:
   my_secret = os.environ['BOT_TOKEN']
@@ -44,6 +67,9 @@ client = discord.Client()
 bot = commands.Bot(command_prefix=prefix)
 
 
+
+
+
 #Check if user is mod
 async def check_mod(ctx):
   try:
@@ -54,7 +80,11 @@ async def check_mod(ctx):
   except:
     await ctx.send("setup mod role. eg:\n -setup mod <role name or id>\n this tells the bot which role to check for when using the bot")
     return(False)
-    
+
+
+
+
+
 #Check prefix of individual server
 def check_prefix(ctx):
   try:
@@ -71,6 +101,9 @@ def check_prefix(ctx):
     return(prefix)
 
 
+
+
+
 @bot.event
 async def on_message(ctx):
   if ctx.content.startswith('ping'):
@@ -81,6 +114,10 @@ async def on_message(ctx):
   cprefix = check_prefix(ctx)
   bot.command_prefix = str(cprefix)
   await bot.process_commands(ctx)
+
+
+
+
 
 @bot.event
 async def on_guild_join(guild):
@@ -94,20 +131,28 @@ async def on_guild_join(guild):
       await i.send(embed=embed)
       break
 
+
+
+
+
 @bot.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(bot))
 
+
+
+
+
+#called when user joins vc
 @bot.event
 async def on_voice_state_update(member, before, after):
   if not before.channel and after.channel:
     role = discord.utils.get(member.guild.roles, name="role name")
     await member.edit(mute=False)
 
-@bot.command(name="h")
-async def help(ctx):
-    helpfile = open("help.txt","r")
-    await ctx.channel.send(helpfile.read())
+
+
+
 
 @bot.command(name='mute')
 async def mute(ctx, member : discord.Member):
@@ -120,6 +165,10 @@ async def mute(ctx, member : discord.Member):
     if checkrole1 == False:
         await ctx.channel.send("hey you dont have a Mod role")
 
+
+
+
+
 @bot.command(name='unmute')
 async def unmute(ctx, member : discord.Member):
     sender:discord.Member = ctx.author
@@ -130,6 +179,10 @@ async def unmute(ctx, member : discord.Member):
         await member.remove_roles(role)
     if checkrole1 not in sender.roles:
         await ctx.channel.send("you dont have the Mod role")
+
+
+
+
 
 @bot.command(name='vcmute')
 async def vcmuteall(ctx):
@@ -144,6 +197,10 @@ async def vcmuteall(ctx):
     else:
         await ctx.channel.send("you dont have Mod role")
 
+
+
+
+
 @bot.command(name='vcunmute')
 async def vcunmuteall(ctx):
     sender:discord.Member = ctx.author
@@ -155,8 +212,13 @@ async def vcunmuteall(ctx):
             print('unmuted ',member)
         print('unmuted everyone in ',vc)
 
-@bot.command(name='vcmove',description='to specify the channels, you can use "" ')
+
+
+
+
+@bot.command(name='vcmove',description='to specify the channels, you can use "" ',help='move the person to specified vc')
 async def vcmove(ctx, members:commands.Greedy[discord.Member], *, channel:discord.VoiceChannel):
+  try:
     sender:discord.Member = ctx.author
     checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
     if checkrole1 in sender.roles:
@@ -164,19 +226,33 @@ async def vcmove(ctx, members:commands.Greedy[discord.Member], *, channel:discor
             await member.move_to(channel=channel)
     else:
         await ctx.channel.send("you dont have Mod role")
+  except discord.ext.commands.errors.MissingRequiredArgument:
+    await ctx.channel.send("Missing Argument")
 
-@bot.command(name='vcmoveall',description='to specify the channels, you can use "" ')
+@vcmove.error
+async def on_error(ctx, error):
+  await error_handler(ctx,error)
+
+@bot.command(name='vcmoveall',discription='to specify the channels, you can use "" ',help='moves an entire vc to another')
 async def vcmoveall(ctx, channel1:discord.VoiceChannel, channel2:discord.VoiceChannel):
-    sender:discord.Member = ctx.author
-    checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
-    members = channel1.members
-    if checkrole1 in sender.roles:
-        for member in members:
-            await member.move_to(channel=channel2)
-    else:
-        await ctx.channel.send("you dont have Mod role")
+  sender:discord.Member = ctx.author
+  checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
+  members = channel1.members
+  if checkrole1 in sender.roles:
+      for member in members:
+          await member.move_to(channel=channel2)
+  else:
+      await ctx.channel.send("you dont have Mod role")
 
-@bot.command(name='serverlist',help='shows how many people added me to their server')
+@vcmoveall
+async def on_error(ctx, error):
+  await error_handler(ctx,error)
+
+
+
+
+
+@bot.command(name='servernum',help='shows how many people added me to their server')
 async def servers(ctx):
     print("\n")
     servers = list(bot.guilds)
@@ -185,7 +261,11 @@ async def servers(ctx):
         print(i.name,"  ",i.id)
     print("\n")
 
-@bot.command(name='serverlistmore',help='only for devs')
+
+
+
+
+@bot.command(name='serverlist',description='only for devs')
 async def serversall(ctx):
   servers = list(bot.guilds)
   for server in servers:
@@ -194,8 +274,13 @@ async def serversall(ctx):
       print("    ",channel.name)
     print("\n\n")
 
-@bot.command(command="setup",help='not working')
+
+
+
+
+@bot.command(command="setup",help='setup the bot')
 async def setup(ctx,prop=None,value=None):
+  #only runs if the user is administrator
   if ctx.message.author.guild_permissions.administrator:
     if value:
       try:
@@ -208,15 +293,14 @@ async def setup(ctx,prop=None,value=None):
       except:
         serverconfig = {}
       print(serverconfig)
-      if prop == "mod":
+      if prop == "mod" or prop == "mute":
         checkrole1 = discord.utils.get(ctx.guild.roles, name = value)
         if checkrole1 == None:
           checkrole1 = ctx.guild.get_role(int(value))
         if checkrole1 != None:
-          serverconfig["mod"] = checkrole1.id
-          await ctx.send("mod is now "+str(checkrole1.name))
+          serverconfig[prop] = checkrole1.id
+          await ctx.send(prop + "is now " + str(checkrole1.name))
         else:
-          print(checkrole1)
           await ctx.send("That Role Doesnt Exist")
       else:
         serverconfig[str(prop)] = str(value)
@@ -224,8 +308,13 @@ async def setup(ctx,prop=None,value=None):
       serverfile = open("servers/" + str(ctx.message.guild.id) + ".json","w")
       serverconfig = json.dump(serverconfig,serverfile,indent=4)
     else:
-      await ctx.send("How to use:\nFirst of all after -setup you have to give it two arguements, one for the property and other for the properties value. for eg:\n-setup mod <name or id of mod role>")
+      await ctx.send("How to use:\nFirst of all after -setup you have to give it two arguements, one for the property and other for the properties value. for eg:\n-setup mod <name or id of mod role>\n for now these are the properties that have a meaning:\nmod\nprefix")
   else:
     ctx.send("get an admin to do this")
+
+
+
+
+
 keep_alive()
 bot.run(str(my_secret))
