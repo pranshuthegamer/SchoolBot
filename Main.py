@@ -299,7 +299,7 @@ async def setup(ctx,prop=None,value=None):
           checkrole1 = ctx.guild.get_role(int(value))
         if checkrole1 != None:
           serverconfig[prop] = checkrole1.id
-          await ctx.send(prop + "is now " + str(checkrole1.name))
+          await ctx.send(prop + " is now " + str(checkrole1.name))
         else:
           await ctx.send("That Role Doesnt Exist")
       else:
