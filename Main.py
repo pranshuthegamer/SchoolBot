@@ -211,7 +211,8 @@ async def vcunmuteall(ctx):
             await member.edit(mute=False)
             print('unmuted ',member)
         print('unmuted everyone in ',vc)
-
+    if checkrole1 not in sender.roles:
+        await ctx.channel.send("you dont have the Mod role")
 
 
 
@@ -308,7 +309,7 @@ async def setup(ctx,prop=None,value=None):
       serverfile = open("servers/" + str(ctx.message.guild.id) + ".json","w")
       serverconfig = json.dump(serverconfig,serverfile,indent=4)
     else:
-      await ctx.send("How to use:\nFirst of all after -setup you have to give it two arguements, one for the property and other for the properties value. for eg:\n-setup mod <name or id of mod role>\n for now these are the properties that have a meaning:\nmod\nprefix")
+      await ctx.send("How to use:\nFirst of all after -setup you have to give it two arguements, one for the property and other for the properties value. for eg:\n-setup mod <name or id of mod role>\n for now these are the properties that have a meaning:\nmod\nprefix\nmute")
   else:
     ctx.send("get an admin to do this")
 
