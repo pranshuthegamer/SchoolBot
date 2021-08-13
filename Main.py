@@ -47,7 +47,7 @@ async def error_handler(ctx, error):
 #
 
 async def msg_random_channel(guild,msg):
-for i in guild.text_channels:
+  for i in guild.text_channels:
     if i.permissions_for(guild.me).send_messages:
       await i.send(msg)
       break
