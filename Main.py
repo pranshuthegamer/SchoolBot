@@ -8,7 +8,7 @@ from discord import DMChannel
 import threading
 import asyncio
 
-#asyncio.get_event_loop().set_debug(True)
+asyncio.get_event_loop().set_debug(True)
 
 
 
@@ -46,11 +46,24 @@ async def error_handler(ctx, error):
 #Reuseable funcs
 #
 
+
+
 async def msg_random_channel(guild,msg):
   for i in guild.text_channels:
     if i.permissions_for(guild.me).send_messages:
       await i.send(msg)
       break
+
+
+
+def get_conf(ctx,guild,prop):
+  try:
+    serverfile = open("servers/" + str(ctx.guild.id)+ ".json","r")
+    serverconfig = json.load(serverfile)
+    val = serverconfig[str(prop)]
+    return(val)
+  except:
+    return(None)
 
 
 
@@ -82,13 +95,13 @@ bot = commands.Bot(command_prefix=prefix)
 
 #Check if user is mod
 async def check_mod(ctx):
-  try:
-    serverfile = open("servers/" + str(ctx.message.guild.id)+ ".json","r")
-    serverconfig = json.open(serverfile)
-    modrole = serverconfig["mod"]
+  modrole = get_conf(ctx,ctx.guild,'mod')
+  if modrole is None:
+    await ctx.send('This server doesnt have a configured mute role!\n try using `' + check_prefix(ctx) + 'setup mod <name or id of mod role>')
+    return(None)
+  elif modrole in ctx.author.roles:
     return(True)
-  except:
-    await ctx.send("setup mod role. eg:\n -setup mod <role name or id>\n this tells the bot which role to check for when using the bot")
+  else:
     return(False)
 
 
@@ -97,17 +110,15 @@ async def check_mod(ctx):
 
 #Check prefix of individual server
 def check_prefix(ctx):
-  try:
-    serverfile = open("servers/" + str(ctx.author.guild.id)+ ".json","r")
-    serverconfig = json.load(serverfile)
-    cprefix = str(serverconfig["prefix"])
-    c = list(str(cprefix))
-    c = c[len(c) - 1]
+  cprefix = get_conf(ctx,ctx.guild,'prefix')
+  c = list(str(cprefix))
+  c = c[len(c) - 1]
+  if cprefix != None:
     if c not in ALPHABETS:
       return(cprefix)
     else:
       return(str(cprefix + " "))
-  except:
+  else:
     return(prefix)
 
 
@@ -133,7 +144,7 @@ async def on_message(ctx):
 async def on_guild_join(guild):
   print("Joined new server: ",guild.name)
   msg = 'Thanks for adding me!\n you can ask an admin to setup this bot using `-setup` and use `-help` for help'
-  msg_random_channel(guild,msg)
+  await msg_random_channel(guild,msg)
   
 
 
@@ -151,30 +162,32 @@ async def on_ready():
 #called when user joins vc
 @bot.event
 async def on_voice_state_update(member, before, after):
-  if not before.channel and after.channel:
-    role = discord.utils.get(member.guild.roles, name="role name")
-    await member.edit(mute=False)
+  try:
+    if not before.channel and after.channel:
+      role = discord.utils.get(member.guild.roles, name="role name")
+      await member.edit(mute=False)
+  except discord.errors.Forbidden:
+    #msg = 'i am missing the Mute permission, which is required for unmuting anyone that joins vc'
+    #await msg_random_channel(member.guild,msg)
+    pass
+    
 
-@on_voice_state_update.error
-async def error(ctx,error):
-  if isinstance(error, discord.errors.Forbidden):
-    print(ctx,error)
 
 
 
 
 @bot.command(name='mute')
 async def mute(ctx, member : discord.Member):
-    checkrole1 = check_mod(ctx)
+    checkrole1 = await check_mod(ctx)
     try:
       if checkrole1:
           role = discord.utils.get(ctx.guild.roles, name="Muted")
           await ctx.channel.send(ctx.author.name + " Muted " + str(member.name))
           await member.add_roles(role)
-      if checkrole1 == False:
-          await ctx.channel.send("hey you dont have a Mod role")
+      elif checkrole1 == False:
+          await ctx.channel.send("hey you dont have a mod role!")
     except:
-      await ctx.channel.send('This server doesnt have a configured mute role, or i cant manage roles!')
+      await ctx.channel.send('This server doesnt have a configured mute role, or i cant manage roles!\n try using `' + check_prefix(ctx) + 'setup mod <name or id of mod role>')
 
 
 
@@ -182,16 +195,16 @@ async def mute(ctx, member : discord.Member):
 
 @bot.command(name='unmute')
 async def unmute(ctx, member : discord.Member):
-  checkrole1 = check_mod(ctx)
-    try:
-      if checkrole1:
-          role = discord.utils.get(ctx.guild.roles, name="Muted")
-          await ctx.channel.send(ctx.author.name + " unmuted " + str(member.name))
-          await member.remove_roles(role)
-      if checkrole1 == False:
-          await ctx.channel.send("you dont have the Mod role")
-    except:
-      await ctx.channel.send('This server doesnt have a configured mute role!')
+  checkrole1 = await check_mod(ctx)
+  try:
+    if checkrole1:
+      role = discord.utils.get(ctx.guild.roles, name="Muted")
+      await ctx.channel.send(ctx.author.name + " unmuted " + str(member.name))
+      await member.remove_roles(role)
+    elif checkrole1 == False:
+          await ctx.channel.send("hey you dont have a mod role!")
+  except:
+    await ctx.channel.send('This server doesnt have a configured mute role, or i cant manage roles!\n try using `' + check_prefix(ctx) + 'setup mod <name or id of mod role>')
 
 
 
@@ -200,16 +213,15 @@ async def unmute(ctx, member : discord.Member):
 
 @bot.command(name='vcmute')
 async def vcmuteall(ctx):
-    sender:discord.Member = ctx.author
-    checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
-    if checkrole1 in sender.roles:
+    checkrole1 = check_mod(ctx)
+    if checkrole1:
         vc = ctx.author.voice.channel
         for member in vc.members:
             await member.edit(mute=True)
             print('muted ',member)
         print('muted everyone in ',vc)
-    else:
-        await ctx.channel.send("you dont have Mod role")
+    elif checkrole1 == False:
+          await ctx.channel.send("hey you dont have a mod role!")
 
 
 
@@ -217,16 +229,15 @@ async def vcmuteall(ctx):
 
 @bot.command(name='vcunmute')
 async def vcunmuteall(ctx):
-    sender:discord.Member = ctx.author
-    checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
-    if checkrole1 in sender.roles:
+    checkrole1 = check_mod(ctx)
+    if checkrole1:
         vc = ctx.author.voice.channel
         for member in vc.members:
             await member.edit(mute=False)
             print('unmuted ',member)
         print('unmuted everyone in ',vc)
-    if checkrole1 not in sender.roles:
-        await ctx.channel.send("you dont have the Mod role")
+    elif checkrole1 == False:
+          await ctx.channel.send("hey you dont have a mod role!")
 
 
 
@@ -239,8 +250,8 @@ async def vcmove(ctx, members:commands.Greedy[discord.Member], *, channel:discor
     if checkrole1 in sender.roles:
         for member in members:
             await member.move_to(channel=channel)
-    else:
-        await ctx.channel.send("you dont have Mod role")
+    elif checkrole1 == False:
+          await ctx.channel.send("hey you dont have a mod role!")
   except discord.ext.commands.errors.MissingRequiredArgument:
     await ctx.channel.send("Missing Argument")
 
@@ -256,10 +267,10 @@ async def vcmoveall(ctx, channel1:discord.VoiceChannel, channel2:discord.VoiceCh
   if checkrole1 in sender.roles:
       for member in members:
           await member.move_to(channel=channel2)
-  else:
-      await ctx.channel.send("you dont have Mod role")
+  elif checkrole1 == False:
+          await ctx.channel.send("hey you dont have a mod role!")
 
-@vcmoveall
+@vcmoveall.error
 async def on_error(ctx, error):
   await error_handler(ctx,error)
 
