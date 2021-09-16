@@ -201,18 +201,16 @@ async def error(ctx,error):
 @bot.command(name='unmute')
 async def unmute(ctx, member : discord.Member):
   checkrole1 = await check_mod(ctx)
-  try:
-    if checkrole1:
-      role = discord.utils.get(ctx.guild.roles, name="Muted")
-      await ctx.channel.send(ctx.author.name + " unmuted " + str(member.name))
-      await member.remove_roles(role)
-    elif checkrole1 == False:
-          await ctx.channel.send("hey you dont have a mod role!")
-  except:
-    await ctx.channel.send('This server doesnt have a configured mute role, or i cant manage roles!\n try using `' + check_prefix(ctx) + 'setup mod <name or id of mod role>')
+  if checkrole1:
+    role = discord.utils.get(ctx.guild.roles, name="Muted")
+    await ctx.channel.send(ctx.author.name + " unmuted " + str(member.name))
+    await member.remove_roles(role)
+  elif checkrole1 == False:
+    await ctx.channel.send("hey you dont have a mod role!")
 
-
-
+@unmute.error
+async def error(ctx,error):
+  await error_handler(ctx,error)
 
 
 
@@ -228,23 +226,27 @@ async def vcmuteall(ctx):
     elif checkrole1 == False:
           await ctx.channel.send("hey you dont have a mod role!")
 
-
+@vcmute.error
+async def error(ctx,error):
+  await error_handler(ctx,error)
 
 
 
 @bot.command(name='vcunmute')
 async def vcunmuteall(ctx):
-    checkrole1 = check_mod(ctx)
-    if checkrole1:
-        vc = ctx.author.voice.channel
-        for member in vc.members:
-            await member.edit(mute=False)
-            print('unmuted ',member)
-        print('unmuted everyone in ',vc)
-    elif checkrole1 == False:
-          await ctx.channel.send("hey you dont have a mod role!")
+  checkrole1 = check_mod(ctx)
+  if checkrole1:
+    vc = ctx.author.voice.channel
+    for member in vc.members:
+      await member.edit(mute=False)
+      print('unmuted ',member)
+    print('unmuted everyone in ',vc)
+  elif checkrole1 == False:
+    await ctx.channel.send("hey you dont have a mod role!")
 
-
+@vcunmute.error
+async def error(ctx,error):
+  await error_handler(ctx,error)
 
 
 @bot.command(name='vcmove',description='to specify the channels, you can use "" ',help='move the person to specified vc')
