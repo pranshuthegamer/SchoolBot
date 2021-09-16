@@ -226,7 +226,7 @@ async def vcmuteall(ctx):
     elif checkrole1 == False:
           await ctx.channel.send("hey you dont have a mod role!")
 
-@vcmute.error
+@vcmuteall.error
 async def error(ctx,error):
   await error_handler(ctx,error)
 
@@ -244,7 +244,7 @@ async def vcunmuteall(ctx):
   elif checkrole1 == False:
     await ctx.channel.send("hey you dont have a mod role!")
 
-@vcunmute.error
+@vcunmuteall.error
 async def error(ctx,error):
   await error_handler(ctx,error)
 
