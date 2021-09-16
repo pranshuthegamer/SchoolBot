@@ -37,9 +37,12 @@ from webserver import keep_alive
 #
 async def error_handler(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send('You didnt give the arguments properly, try using help')
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send('You do not have manage_messages permssion')
+      await ctx.send('You didnt give the arguments properly, try using help')
+    elif isinstance(error, commands.MissingPermissions):
+      await ctx.send('You do not have manage_messages permssion')
+    else:
+      print(error)
+
 
 
 #
@@ -96,13 +99,14 @@ bot = commands.Bot(command_prefix=prefix)
 #Check if user is mod
 async def check_mod(ctx):
   modrole = get_conf(ctx,ctx.guild,'mod')
+  print(ctx.author.roles)
   if modrole is None:
-    await ctx.send('This server doesnt have a configured mute role!\n try using `' + check_prefix(ctx) + 'setup mod <name or id of mod role>')
+    await ctx.send('This server doesnt have a configured MOD role!\n try using `' + check_prefix(ctx) + 'setup mod <name or id of mod role>')
     return(None)
-  elif modrole in ctx.author.roles:
-    return(True)
-  else:
-    return(False)
+  for i in ctx.author.roles:
+    if i.id == modrole:
+      return True
+  return False
 
 
 
@@ -170,6 +174,8 @@ async def on_voice_state_update(member, before, after):
     #msg = 'i am missing the Mute permission, which is required for unmuting anyone that joins vc'
     #await msg_random_channel(member.guild,msg)
     pass
+  except discord.errors.HTTPException:
+    pass
     
 
 
@@ -178,18 +184,17 @@ async def on_voice_state_update(member, before, after):
 
 @bot.command(name='mute')
 async def mute(ctx, member : discord.Member):
-    checkrole1 = await check_mod(ctx)
-    try:
-      if checkrole1:
-          role = discord.utils.get(ctx.guild.roles, name="Muted")
-          await ctx.channel.send(ctx.author.name + " Muted " + str(member.name))
-          await member.add_roles(role)
-      elif checkrole1 == False:
-          await ctx.channel.send("hey you dont have a mod role!")
-    except:
-      await ctx.channel.send('This server doesnt have a configured mute role, or i cant manage roles!\n try using `' + check_prefix(ctx) + 'setup mod <name or id of mod role>')
+  checkrole1 = await check_mod(ctx)
+  if checkrole1:
+    role = discord.utils.get(ctx.guild.roles, name="Muted")
+    await ctx.channel.send(ctx.author.name + " Muted " + str(member.name))
+    await member.add_roles(role)
+  elif checkrole1 == False:
+    await ctx.channel.send("hey you dont have a mod role!")
 
-
+@mute.error
+async def error(ctx,error):
+  await error_handler(ctx,error)
 
 
 
