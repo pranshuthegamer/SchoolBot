@@ -36,12 +36,11 @@ from webserver import keep_alive
 # error handling
 #
 async def error_handler(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-      await ctx.send('You didnt give the arguments properly, try using help')
-    elif isinstance(error, commands.MissingPermissions):
-      await ctx.send('You do not have manage_messages permssion')
-    else:
-      print(error)
+  print(error)
+  if isinstance(error, commands.MissingRequiredArgument):
+    await ctx.send('You didnt give the arguments properly, try using help')
+  elif isinstance(error, commands.MissingPermissions):
+    await ctx.send('You do not have manage_messages permssion')
 
 
 
@@ -99,7 +98,6 @@ bot = commands.Bot(command_prefix=prefix)
 #Check if user is mod
 async def check_mod(ctx):
   modrole = get_conf(ctx,ctx.guild,'mod')
-  print(ctx.author.roles)
   if modrole is None:
     await ctx.send('This server doesnt have a configured MOD role!\n try using `' + check_prefix(ctx) + 'setup mod <name or id of mod role>')
     return(None)
@@ -107,8 +105,6 @@ async def check_mod(ctx):
     if i.id == modrole:
       return True
   return False
-
-
 
 
 
@@ -216,7 +212,7 @@ async def error(ctx,error):
 #command to mute users in vc
 @bot.command(name='vcmute')
 async def vcmuteall(ctx):
-    checkrole1 = check_mod(ctx)
+    checkrole1 = await check_mod(ctx)
     if checkrole1:
         vc = ctx.author.voice.channel
         for member in vc.members:
@@ -234,7 +230,7 @@ async def error(ctx,error):
 
 @bot.command(name='vcunmute')
 async def vcunmuteall(ctx):
-  checkrole1 = check_mod(ctx)
+  checkrole1 = await check_mod(ctx)
   if checkrole1:
     vc = ctx.author.voice.channel
     for member in vc.members:
@@ -251,16 +247,13 @@ async def error(ctx,error):
 
 @bot.command(name='vcmove',description='to specify the channels, you can use "" ',help='move the person to specified vc')
 async def vcmove(ctx, members:commands.Greedy[discord.Member], *, channel:discord.VoiceChannel):
-    try:
-        sender:discord.Member = ctx.author
-        checkrole1 = discord.utils.get(ctx.guild.roles, name = "Mod")
-        if checkrole1 in sender.roles:
-            for member in members:
-                await member.move_to(channel=channel)
-        elif checkrole1 == False:
-            await ctx.channel.send("hey you dont have a mod role!")
-    except discord.ext.commands.errors.MissingRequiredArgument:
-        await ctx.channel.send("Missing Argument")
+    sender:discord.Member = ctx.author
+    checkrole1 = await check_mod(ctx)
+    if checkrole1:
+        for member in members:
+            await member.move_to(channel=channel)
+    elif checkrole1 == False:
+        await ctx.channel.send("hey you dont have a mod role!")
 
 @vcmove.error
 async def on_error(ctx, error):
