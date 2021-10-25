@@ -7,8 +7,9 @@ from discord.ext import commands
 from discord import DMChannel
 import threading
 import asyncio
+import time
 
-asyncio.get_event_loop().set_debug(True)
+asyncio.get_event_loop().set_debug(False)
 
 
 
@@ -18,6 +19,8 @@ intents = discord.Intents.default()
 intents.presences = True ##->> all this is required
 
 prefix = "-"
+
+looparray = []
 
 setuprunning = True
 setupprogress = 0
@@ -273,6 +276,21 @@ async def vcmoveall(ctx, channel1:discord.VoiceChannel, channel2:discord.VoiceCh
 @vcmoveall.error
 async def on_error(ctx, error):
   await error_handler(ctx,error)
+
+
+
+
+
+
+
+@bot.command(name='spam',help='only works on a select server',description='only works on a select server')
+async def spam(ctx,message=None,times=None):
+    if times != None:
+        for i in range(int(times)):
+            time.sleep(0.5)
+            await ctx.send(str(message))
+    else:
+        await ctx.send('error')
 
 
 
